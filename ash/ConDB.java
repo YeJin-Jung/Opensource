@@ -5,10 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.BufferedReader;
-import java.util.StringTokenizer;
-import java.util.SortedSet;
 import java.util.HashSet;
 import java.util.Iterator;
+
+//데이터베이스 쿼리용 클래스
 
 public class ConDB {
 
