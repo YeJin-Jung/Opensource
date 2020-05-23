@@ -3,6 +3,12 @@ import java.security.MessageDigest;
 
 public class Encrypting {
 
+
+  private Encrypting()
+  {
+    //스태틱 메소드만 이용하도록 함
+  }
+
   static String encrypt(String pw)
   {
     String sha="";

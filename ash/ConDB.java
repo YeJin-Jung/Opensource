@@ -1,5 +1,7 @@
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
 //데이터베이스 쿼리용 클래스
 
@@ -397,7 +401,7 @@ public class ConDB {
         }
     }
 
-    public String getTrain(String email,String purpose,String difficulty)//오늘의 운동 새로 가져오기
+    public String getTrain(String email,String purpose,String difficulty)//오늘의 운동 새로 가져오기(이 메소드를 getTrain_Check의 train 매개변수로 사용할 것)
     {
         try
         {
@@ -858,7 +862,99 @@ public class ConDB {
         }
     }
 
-    public String checkLog(String email,String date)//오늘의 운동 체크
+    public String getTrain_Check(String email,String train)//기존의 운동 로그와 비교해 오늘의 운동을 새로 가져오기
+    {
+        ArrayList<Train> arr_train=new ArrayList<>();
+        ArrayList<String> arr_log=new ArrayList<>();
+        StringTokenizer st_ln=new StringTokenizer(train,"%");
+        ArrayList<String> train_ln=new ArrayList<>();
+        while(st_ln.hasMoreTokens())
+        {
+            train_ln.add(st_ln.nextToken());
+        }
+        for(int i=0;i<train_ln.size();i++)
+        {
+            StringTokenizer st_att=new StringTokenizer(train_ln.get(i),"/");
+            Train t=new Train();
+            t.name=st_att.nextToken();
+            t.quantity=Integer.parseInt(st_att.nextToken());
+            t.unit=st_att.nextToken();
+            t.sett=Integer.parseInt(st_att.nextToken());
+            arr_train.add(t);
+        }
+
+        train_ln.clear();
+        String[] recent=getDate();
+        for(int i=0;i<recent.length;i++)
+        {
+            String log=checkLog(email,recent[i]);
+            if(log.equals("N"))
+            {
+                
+            }
+            else if(log.equals("Error"))
+            {
+                return "Error";
+            }
+            else
+            {
+                arr_log.add(log);
+            }
+        }
+        for(int i=0;i<arr_log.size();i++)
+        {
+            st_ln=new StringTokenizer(arr_log.get(i),"%");
+            while(st_ln.hasMoreTokens())
+            {
+                train_ln.add(st_ln.nextToken());
+            }
+            for(int j=0;j<train_ln.size();j++)
+            {
+                StringTokenizer st_att=new StringTokenizer(train_ln.get(j),"/");
+                for(int k=0;k<arr_train.size();k++)
+                {
+                    if(arr_train.get(k).name.equals(st_att.nextToken()))
+                    {
+                        arr_train.get(k).log_quan.add(Integer.parseInt(st_att.nextToken()));
+                        String unit=st_att.nextToken();
+                        arr_train.get(k).log_sett.add(Integer.parseInt(st_att.nextToken()));
+                    }
+                }
+            }            
+        }
+
+        for(int i=0;i<arr_train.size();i++)
+        {
+            arr_train.get(i).setQuan();
+            arr_train.get(i).setSett();
+        }
+
+        String toReturn="";
+
+        for(int i=0;i<arr_train.size();i++)
+        {
+            toReturn=toReturn+arr_train.get(i).name+"/"
+            +arr_train.get(i).quantity+"/"
+            +arr_train.get(i).unit+"/"
+            +arr_train.get(i).sett+"%";
+        }
+        return toReturn;
+    }
+
+    private String[] getDate()//최근 5일까지의 데이터를 얻기 위함.
+    {
+        String[] recent=new String[6];
+        for(int i=0;i<6;i++)
+        {
+            Date date=new Date();
+            date=new Date(date.getTime()+(1000*60*60*24*(-i)));
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd",Locale.KOREA);
+            recent[i]=sdf.format(date);
+        }
+        return recent;
+    }
+
+    public String checkLog(String email,String date)//해당 날짜의 운동 체크
     {
         try{
             setDB();
