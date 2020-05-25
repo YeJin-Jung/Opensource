@@ -31,10 +31,6 @@ public class Train
       quantity=(int)Math.round(result);
     }
     
-
-    
-    
-
     
 
     
