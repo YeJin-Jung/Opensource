@@ -1,17 +1,15 @@
 import java.util.Properties;
 
 import javax.mail.*;
-import javax.mail.event.*;
 import javax.mail.internet.*;
-import javax.mail.search.*;
-import javax.mail.util.*;
+
 
 public class Mail {
 
   String host="smtp.naver.com";//네이버 메일
 
   private final String username="hometrainingplanner";
-  private final String password="(ZXasqw12)";
+  private final String password="";
 
 
   public void send(String toAddress,String pw)

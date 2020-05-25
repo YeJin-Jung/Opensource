@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.Stack;
 
 //데이터베이스 쿼리용 클래스
 
@@ -478,15 +479,17 @@ public class ConDB {
                     randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
                 }
                 Iterator it=randomNum.iterator();
+                Stack<String> stack=new Stack<>();
+
                 while(it.hasNext())
                 {
-                    trueList.add(list.get((int)it.next()));
+                    stack.push(list.get((int)it.next()));
                 }
 
-                for(int i=0;i<trueList.size();i++)
+                for(int i=0;i<stack.size();i++)
                 {
                     sql="SELECT name,quantity,unit,sett FROM train_middle\n"
-                    +"WHERE name='"+trueList.get(i)+"'";
+                    +"WHERE name='"+stack.pop()+"'";
                     stmt.executeQuery(sql);
                     train=train+result.getString("name")+"/"
                     +Integer.toString(result.getInt("quantity"))+"/"
