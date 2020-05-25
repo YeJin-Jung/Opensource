@@ -1,15 +1,45 @@
 import java.util.Properties;
-
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 
 public class Mail {
 
   String host="smtp.naver.com";//네이버 메일
 
-  private final String username="hometrainingplanner";
-  private final String password="";
+  private String username;
+	private String password;
+	
+	Mail()//파일로부터 발신용 이메일 계정 정보 가져오기
+	{
+		File file=new File("./mail.txt");
+		String readData;
+		ArrayList<String> arr_acc=new ArrayList<>();
+		try
+		{
+			FileReader fr=new FileReader(file);
+			BufferedReader br=new BufferedReader(fr);
+			while((readData=br.readLine())!=null)
+			{
+				arr_acc.add(readData);
+			}
+			username=arr_acc.get(0);
+			password=arr_acc.get(1);
+			br.close();
+			fr.close();
+			arr_acc.clear();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+	
 
 
   public void send(String toAddress,String pw)

@@ -408,7 +408,6 @@ public class ConDB {
         {
             String sql;
             ArrayList<String> list=new ArrayList<>();
-            ArrayList<String> trueList=new ArrayList<>();
             setDB();
             if(purpose.equals("지구력 강화"))
             {
@@ -443,7 +442,7 @@ public class ConDB {
                     stack.push(list.get((int)it.next()));
                 }
 
-                for(int i=0;i<trueList.size();i++)
+                for(int i=0;i<stack.size();i++)
                 {
                     sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
                     +"WHERE name='"+stack.pop()+"'";
@@ -529,7 +528,7 @@ public class ConDB {
                     stack.push(list.get((int)it.next()));
                 }
 
-                for(int i=0;i<trueList.size();i++)
+                for(int i=0;i<stack.size();i++)
                 {
                     sql="SELECT name,quantity,unit,sett FROM train_high\n"
                     +"WHERE name='"+stack.pop()+"'";
