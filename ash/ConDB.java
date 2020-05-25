@@ -437,15 +437,16 @@ public class ConDB {
                     randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
                 }
                 Iterator it=randomNum.iterator();
+                Stack<String> stack=new Stack<>();
                 while(it.hasNext())
                 {
-                    trueList.add(list.get((int)it.next()));
+                    stack.push(list.get((int)it.next()));
                 }
 
                 for(int i=0;i<trueList.size();i++)
                 {
                     sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
-                    +"WHERE name='"+trueList.get(i)+"'";
+                    +"WHERE name='"+stack.pop()+"'";
                     stmt.executeQuery(sql);
                     train=train+result.getString("name")+"/"
                     +Integer.toString(result.getInt("quantity"))+"/"
@@ -522,15 +523,16 @@ public class ConDB {
                     randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
                 }
                 Iterator it=randomNum.iterator();
+                Stack<String> stack=new Stack<>();
                 while(it.hasNext())
                 {
-                    trueList.add(list.get((int)it.next()));
+                    stack.push(list.get((int)it.next()));
                 }
 
                 for(int i=0;i<trueList.size();i++)
                 {
                     sql="SELECT name,quantity,unit,sett FROM train_high\n"
-                    +"WHERE name='"+trueList.get(i)+"'";
+                    +"WHERE name='"+stack.pop()+"'";
                     stmt.executeQuery(sql);
                     train=train+result.getString("name")+"/"
                     +Integer.toString(result.getInt("quantity"))+"/"
