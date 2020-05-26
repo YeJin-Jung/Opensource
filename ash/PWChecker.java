@@ -1,7 +1,7 @@
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 
-public class PWChecker extends Thread{
+public class PWChecker extends Thread{//비밀번호 일치여부 검사 스레드
   private JPasswordField pw;
   private JPasswordField pwc;
   private JLabel lb;
@@ -9,9 +9,9 @@ public class PWChecker extends Thread{
   private String passwordCheck;
 
 
-  boolean running;
+  private boolean running;//스레드 작동 여부
 
-  PWChecker(JPasswordField pw,JPasswordField pwc,JLabel lb)
+  PWChecker(JPasswordField pw,JPasswordField pwc,JLabel lb)//JPasswordField와 비밀번호 일치여부 표기 Label 받아옴
   {
     this.pw=pw;
     this.pwc=pwc;
@@ -19,9 +19,12 @@ public class PWChecker extends Thread{
     running=true;
   }
 
-  
+  public void closeChecker()//스레드 멈추기 메소드
+  {
+    running=false;
+  }
 
-  public void run()
+  public void run()//검사 메소드
   {
     while(running)
     {
