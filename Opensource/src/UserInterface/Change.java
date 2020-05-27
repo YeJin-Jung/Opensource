@@ -6,11 +6,8 @@ public class Change extends JFrame {
 	private String email;
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JPasswordField passwordField;
-	private JPasswordField passwordField_1;
 
-	public Change() {
+	public Change(String email) {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 399);
 		contentPane = new JPanel();
