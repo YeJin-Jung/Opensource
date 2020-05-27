@@ -41,8 +41,7 @@ public class JoinFram extends JFrame {
 		JPasswordField txt_pwc=new JPasswordField("");
 		JLabel lb_PWSame=new JLabel("");
 
-		PWChecker pwchecker=new PWChecker(txt_pw,txt_pwc,lb_PWSame);
-		pwchecker.start();
+		
 
 		JButton btn_enter=new JButton("회원 가입");
 		
@@ -58,32 +57,59 @@ public class JoinFram extends JFrame {
 				{
 					lb_check.setText("사용 가능");
 				}
-				else
+				else if(res.equals("N"))
 				{
 					lb_check.setText("사용 불가");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,"예상치 못한 오류가 발생했습니다.");
 				}
 			}
 		}
 
 		class Action_Enter implements ActionListener //회원 가입 버튼 이벤트
 		{
+			private String pwToString(char[] pw)
+			{
+				String password="";
+				for(int i=0;i<pw.length;i++)
+				{
+					password+=pw[i];
+				}
+				return password;
+			}
+
+
+
 			public void actionPerformed(ActionEvent e)
 			{
 				if(lb_check.getText().equals("사용 가능")&&lb_PWSame.getText().equals("비밀번호 일치"))
 				{
-					String password="";
-					for(int i=0;i<txt_pw.getPassword().length;i++)
+					if(!txt_name.getText().equals("")&&!txt_email.getText().equals("")
+					&&!pwToString(txt_pw.getPassword()).equals("")
+					&&!pwToString(txt_pwc.getPassword()).equals(""))
 					{
-						password+=txt_pw.getPassword()[i];
+						ConDB db=new ConDB();
+					  String res=db.SignUp(txt_email.getText(), txt_name.getText(), pwToString(txt_pw.getPassword()));
+					  if(res.equals("Clear"))
+					  {
+						  JOptionPane.showMessageDialog(null,"회원 가입에 성공하였습니다.");
+						  new LoginFram();   //사용할 땐 이것을 이용하도록 함
+						  dispose();
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null,"예상치 못한 오류가 발생했습니다.");
+						}
+
 					}
-					ConDB db=new ConDB();
-					String res=db.SignUp(txt_email.getText(), txt_name.getText(), password);
-					if(res.equals("Clear"))
+					else
 					{
-						JOptionPane.showMessageDialog(null,"회원 가입에 성공하였습니다.");
-						new LoginFram();   //사용할 땐 이것을 이용하도록 함
-						dispose();
+						JOptionPane.showMessageDialog(null,"정보 입력을 빈칸 없이 해주세요.");
 					}
+					
+					
 				}
 				else
 				{
@@ -94,6 +120,9 @@ public class JoinFram extends JFrame {
 		
 		btn_check.addActionListener(new Action_ECheck());
 		btn_enter.addActionListener(new Action_Enter());
+
+		PWChecker pwchecker=new PWChecker(txt_pw,txt_pwc,lb_PWSame);
+		pwchecker.start();
 		
 		ct_panel.add(lb_name);
 		ct_panel.add(txt_name);
@@ -108,7 +137,7 @@ public class JoinFram extends JFrame {
 		ct_panel.add(lb_PWSame);
 		
 		contentPane.add(lb_SignUp,BorderLayout.NORTH);
-		contentPane.add(ct_panel,BorderLayout.CENTER;
+		contentPane.add(ct_panel,BorderLayout.CENTER);
 		contentPane.add(btn_enter,BorderLayout.SOUTH);
 		setSize(600,600);
 		setVisible(true);
