@@ -1,103 +1,117 @@
-package UserInterface;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JPasswordField;
 
 public class JoinFram extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JPasswordField passwordField;
-	private JTextField textField_4;
-	private JPasswordField passwordField_1;
-	private JPasswordField passwordField_2;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					JoinFram frame = new JoinFram();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
-	/**
-	 * Create the frame.
-	 */
-	public JoinFram() {
+	public JoinFram() 
+	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
+		contentPane.setLayout(new BorderLayout(5,5));
 		
-		JLabel lblNewLabel = new JLabel("회원가입\n");
-		lblNewLabel.setBounds(143, 17, 138, 25);
-		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPane.add(lblNewLabel);
+		JLabel lb_SignUp = new JLabel("회원가입\n");
+		lb_SignUp.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+		lb_SignUp.setHorizontalAlignment(SwingConstants.CENTER);
+		contentPane.add(lb_SignUp,BorderLayout.NORTH);
 		
-		JLabel lblNewLabel_1 = new JLabel("이름");
-		lblNewLabel_1.setBounds(34, 60, 61, 16);
-		contentPane.add(lblNewLabel_1);
+		GridLayout grid=new GridLayout(6,2,5,5);
+		JPanel ct_panel=new JPanel(grid);
+		JLabel lb_name = new JLabel("이름");
+		JTextField txt_name=new JTextField();
 		
-		JLabel lblNewLabel_1_1 = new JLabel("이메일");
-		lblNewLabel_1_1.setBounds(35, 88, 61, 16);
-		contentPane.add(lblNewLabel_1_1);
+		JLabel lb_email = new JLabel("이메일");
+		JTextField txt_email=new JTextField();
+
+		JButton btn_check = new JButton("이메일 중복확인");
+		JLabel lb_check=new JLabel();
 		
-		JLabel lblNewLabel_1_2 = new JLabel("비밀번호");
-		lblNewLabel_1_2.setBounds(34, 120, 61, 16);
-		contentPane.add(lblNewLabel_1_2);
+		JLabel lb_pw = new JLabel("비밀번호");
+		JPasswordField txt_pw=new JPasswordField("");
 		
-		JLabel lblNewLabel_1_2_1 = new JLabel("비밀번호 확인");
-		lblNewLabel_1_2_1.setBounds(34, 147, 80, 16);
-		contentPane.add(lblNewLabel_1_2_1);
+		JLabel lb_pwc = new JLabel("비밀번호 확인");
+		JPasswordField txt_pwc=new JPasswordField("");
+		JLabel lb_PWSame=new JLabel("");
+
+		PWChecker pwchecker=new PWChecker(txt_pw,txt_pwc,lb_PWSame);
+		pwchecker.start();
+
+		JButton btn_enter=new JButton("회원 가입");
 		
-		textField = new JTextField();
-		textField.setBounds(151, 54, 130, 26);
-		contentPane.add(textField);
-		textField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("중복확인");
-		btnNewButton.setBounds(290, 83, 88, 25);
-		contentPane.add(btnNewButton);
 		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(151, 83, 130, 26);
-		contentPane.add(textField_4);
+		class Action_ECheck implements ActionListener //이메일 중복 검사 버튼 이벤트
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ConDB db=new ConDB();
+				String res=db.emailCheck(txt_email.getText());
+				if(res.equals("E"))
+				{
+					lb_check.setText("사용 가능");
+				}
+				else
+				{
+					lb_check.setText("사용 불가");
+				}
+			}
+		}
+
+		class Action_Enter implements ActionListener //회원 가입 버튼 이벤트
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(lb_check.getText().equals("사용 가능")&&lb_PWSame.getText().equals("비밀번호 일치"))
+				{
+					String password="";
+					for(int i=0;i<txt_pw.getPassword().length;i++)
+					{
+						password+=txt_pw.getPassword()[i];
+					}
+					ConDB db=new ConDB();
+					String res=db.SignUp(txt_email.getText(), txt_name.getText(), password);
+					if(res.equals("Clear"))
+					{
+						JOptionPane.showMessageDialog(null,"회원 가입에 성공하였습니다.");
+						new LoginFram();   //사용할 땐 이것을 이용하도록 함
+						dispose();
+					}
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "아이디 중복 여부,비밀번호 일치 여부를 확실하게 해주세요.");
+				}
+			}
+		}
 		
-		passwordField_1 = new JPasswordField();
-		passwordField_1.setBounds(151, 142, 130, 26);
-		contentPane.add(passwordField_1);
+		btn_check.addActionListener(new Action_ECheck());
+		btn_enter.addActionListener(new Action_Enter());
 		
-		passwordField_2 = new JPasswordField();
-		passwordField_2.setBounds(151, 115, 130, 26);
-		contentPane.add(passwordField_2);
+		ct_panel.add(lb_name);
+		ct_panel.add(txt_name);
+		ct_panel.add(lb_email);
+		ct_panel.add(txt_email);
+		ct_panel.add(btn_check);
+		ct_panel.add(lb_check);
+		ct_panel.add(lb_pw);
+		ct_panel.add(txt_pw);
+		ct_panel.add(lb_pwc);
+		ct_panel.add(txt_pwc);
+		ct_panel.add(lb_PWSame);
 		
-		JButton btnNewButton_1 = new JButton("가입완료");
-		btnNewButton_1.setBounds(301, 218, 88, 25);
-		contentPane.add(btnNewButton_1);
+		contentPane.add(lb_SignUp,BorderLayout.NORTH);
+		contentPane.add(ct_panel,BorderLayout.CENTER;
+		contentPane.add(btn_enter,BorderLayout.SOUTH);
+		setSize(600,600);
+		setVisible(true);
+		
 	}
 }
