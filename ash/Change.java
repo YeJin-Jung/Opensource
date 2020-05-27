@@ -7,7 +7,7 @@ public class Change extends JFrame {
 
 	private JPanel contentPane;
 
-	public Change() {
+	public Change(String email) {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 399);
 		contentPane = new JPanel();
