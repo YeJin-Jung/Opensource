@@ -68,6 +68,10 @@ public class ConDB {
             setDB();
             String sql = "INSERT INTO user_info\n" + "VALUES(''" + email + "','" + name + "','" + pw + "')";
             stmt.executeUpdate(sql);
+            sql="UPDATE user_info\n"
+            +"SET first=1\n"
+            +"WHERE email='"+email+"'";
+            stmt.executeUpdate(sql);
             // 해당 회원 운동 로그 테이블 생성
             sql = "CREATE TABLE `hometrainingplanner`.`" + email + "_train_log` (\n" + "`date` VARCHAR(45) NOT NULL,\n"
                     + "`log` VARCHAR(5000) NOT NULL,\n" + "PRIMARY KEY(`date`));";
@@ -110,6 +114,10 @@ public class ConDB {
             sql = "UPDATE user_info\n" + "SET difficulty='" + difficulty + "'\n" + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
             sql = "UPDATE user_info\n" + "SET purpose='" + purpose + "'\n" + "WHERE email='" + email + "'";
+            stmt.executeUpdate(sql);
+            sql="UPDATE user_info\n"
+            +"SET first="+0
+            +"WHERE email='"+email+"'";
             stmt.executeUpdate(sql);
             commit();
             return "Clear";
