@@ -27,8 +27,9 @@ public class Mail {
 			{
 				arr_acc.add(readData);
 			}
-			username=arr_acc.get(0);
-			password=arr_acc.get(1);
+			AccDecode ad=new AccDecode();
+			username=ad.getPlain(arr_acc.get(0));
+			password=ad.getPlain(arr_acc.get(1));
 			br.close();
 			fr.close();
 			arr_acc.clear();
