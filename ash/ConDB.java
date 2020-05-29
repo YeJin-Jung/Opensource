@@ -38,8 +38,9 @@ public class ConDB {
                 {
                     al.add(readData);
                 }
-                user=al.get(0);
-                password=al.get(1);
+                AccDecode ad=new AccDecode();
+                user=ad.getPlain(al.get(0));
+                password=ad.getPlain(al.get(1));
                 br.close();
                 fr.close();
             } catch (IOException e) {
