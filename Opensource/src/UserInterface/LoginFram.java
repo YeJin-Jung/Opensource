@@ -29,7 +29,10 @@ public class LoginFram extends JFrame{
 	JoinFram join = new JoinFram();
 	PwSearch ps = new PwSearch();
 	ConDB DB = new ConDB();
-	CardLayout card = new CardLayout();
+	Sex Sex = new Sex();
+	
+	public static String email;
+
 
 	private JPanel contentPane;
 	private JTextField tfEmail;
@@ -179,7 +182,38 @@ public class LoginFram extends JFrame{
 					//로그인 성공 
 					else if(existLogin.equals("OK")) {
 						
-						JOptionPane.showMessageDialog(null,"로그인 성공.");
+						
+						
+						email = tfEmail.getText();
+						
+						
+						String first = DB.firstCheck(email);
+						
+						if(first.equals("F"))
+						{
+							JOptionPane.showMessageDialog(null,"첫 로그인인 경우 운동 플랜 추천을 위해 추가 정보를 입력해야 합니다.\n추가 정보 입력창으로 넘어갑니다.");
+						
+							
+							dispose();
+							
+						
+							Sex.main(null);
+						}
+						
+						else if(first.equals("N"))
+						{
+							JOptionPane.showMessageDialog(null,"오늘의 운동 플랜으로 넘어갑니다.");
+							dispose();
+						}
+						
+						else
+						{
+							JOptionPane.showMessageDialog(null,"예상치 못한 오류가 발생하였습니다.");
+							System.exit(0);
+						}
+						
+						
+						
 						dispose();
 						
 					}
