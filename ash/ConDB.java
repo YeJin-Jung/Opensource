@@ -25,22 +25,21 @@ public class ConDB {
     private String user = "";
     private String password = "";
 
-    ConDB() //DB 권한 유저 계정 획득 및 DB 접속 조건 세팅
+    ConDB() // DB 권한 유저 계정 획득 및 DB 접속 조건 세팅
     {
-        File file = new File("./DBuser.txt");//DB 권한 유저 계정 파일
+        File file = new File("./DBuser.txt");// DB 권한 유저 계정 파일
         try {
             ArrayList<String> al = new ArrayList<>();
             String readData;
-            FileReader fr=new FileReader(file);
+            FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             try {
-                while ((readData = br.readLine()) != null) 
-                {
+                while ((readData = br.readLine()) != null) {
                     al.add(readData);
                 }
-                AccDecode ad=new AccDecode();
-                user=ad.getPlain(al.get(0));
-                password=ad.getPlain(al.get(1));
+                AccDecode ad = new AccDecode();
+                user = ad.getPlain(al.get(0));
+                password = ad.getPlain(al.get(1));
                 br.close();
                 fr.close();
             } catch (IOException e) {
@@ -59,7 +58,6 @@ public class ConDB {
             System.out.println("드라이버 로딩 오류: " + ed.getMessage());
             return;
         }
-        
 
     }
 
@@ -69,13 +67,15 @@ public class ConDB {
             setDB();
             String sql = "INSERT INTO user_info\n" + "VALUES(''" + email + "','" + name + "','" + pw + "')";
             stmt.executeUpdate(sql);
-            sql="UPDATE user_info\n"
-            +"SET first=1\n"
-            +"WHERE email='"+email+"'";
+            sql = "UPDATE user_info\n" + "SET first=1\n" + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
             // 해당 회원 운동 로그 테이블 생성
             sql = "CREATE TABLE `hometrainingplanner`.`" + email + "_train_log` (\n" + "`date` VARCHAR(45) NOT NULL,\n"
                     + "`log` VARCHAR(5000) NOT NULL,\n" + "PRIMARY KEY(`date`));";
+            stmt.execute(sql);
+            sql = "CREATE TABLE `hometrainingplanner`.`" + email + "_today` (\n" + "`name` VARCHAR(100) NOT NULL,\n"
+                    + "`quantity` INT(11) NOT NULL,\n" + "`unit` VARCHAR(10) NOT NULL,\n" + "`sett` INT(11) NOTNULL,\n"
+                    + "PRIMARY KEY(`name`));";
             stmt.execute(sql);
             commit();
             return "Clear";
@@ -116,9 +116,7 @@ public class ConDB {
             stmt.executeUpdate(sql);
             sql = "UPDATE user_info\n" + "SET purpose='" + purpose + "'\n" + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
-            sql="UPDATE user_info\n"
-            +"SET first="+0
-            +"WHERE email='"+email+"'";
+            sql = "UPDATE user_info\n" + "SET first=" + 0 + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
             commit();
             return "Clear";
@@ -130,98 +128,74 @@ public class ConDB {
         return "";
     }
 
-    public String findPW(String email,String name)//비밀번호 찾기
+    public String findPW(String email, String name)// 비밀번호 찾기
     {
-        try{
+        try {
             setDB();
-            String sql="SELECT email,name FROM user_info\n"
-            +"WHERE email='"+email+"'AND name='"+name+"'";
-            result=stmt.executeQuery(sql);
-            if(result.getString(0)==null)
-            {
+            String sql = "SELECT email,name FROM user_info\n" + "WHERE email='" + email + "'AND name='" + name + "'";
+            result = stmt.executeQuery(sql);
+            if (result.getString(0) == null) {
                 commit();
                 return "E";
-            }
-            else
-            {
-                Mail mail=new Mail();
-                String pw=MakePW.mkpw();
-                mail.send(result.getString("email"),pw);
-                sql="UPDATE user_info\n"
-                +"SET pw=''"+Encrypting.encrypt(pw)+"'\n"
-                +"WHERE email='"+email+"'";
+            } else {
+                Mail mail = new Mail();
+                String pw = MakePW.mkpw();
+                mail.send(result.getString("email"), pw);
+                sql = "UPDATE user_info\n" + "SET pw=''" + Encrypting.encrypt(pw) + "'\n" + "WHERE email='" + email
+                        + "'";
                 stmt.executeUpdate(sql);
                 commit();
                 return "Clear";
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String login(String email,String pw)//로그인
+    public String login(String email, String pw)// 로그인
     {
-        try{
+        try {
             setDB();
-            String sql="SELECT email FROM user_info\n"
-            +"WHERE email='"+email+"'";
-            result=stmt.executeQuery(sql);
-            if(result.getString("email")==null)
-            {
+            String sql = "SELECT email FROM user_info\n" + "WHERE email='" + email + "'";
+            result = stmt.executeQuery(sql);
+            if (result.getString("email") == null) {
                 commit();
                 return "email";
-            }
-            else
-            {
-                sql="SELECT pw FROM user_info\n"
-                +"WHERE email='"+email+"'";
-                result=stmt.executeQuery(sql);
-                if(result.getString("pw").equals(Encrypting.encrypt(pw)))
-                {
+            } else {
+                sql = "SELECT pw FROM user_info\n" + "WHERE email='" + email + "'";
+                result = stmt.executeQuery(sql);
+                if (result.getString("pw").equals(Encrypting.encrypt(pw))) {
                     commit();
                     return "OK";
-                }
-                else
-                {
+                } else {
                     commit();
                     return "pw";
                 }
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String firstCheck(String email)//첫 로그인인지 확인
+    public String firstCheck(String email)// 첫 로그인인지 확인
     {
-        try
-        {
+        try {
             setDB();
-            String sql="SELECT first FROM user_info\n"
-            +"WHERE email='"+email+"'";
-            result=stmt.executeQuery(sql);
-            if(result.getInt("first")==1)
-            {
+            String sql = "SELECT first FROM user_info\n" + "WHERE email='" + email + "'";
+            result = stmt.executeQuery(sql);
+            if (result.getInt("first") == 1) {
                 commit();
                 return "F";
-            }
-            else
-            {
+            } else {
                 commit();
                 return "N";
             }
 
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
@@ -229,43 +203,33 @@ public class ConDB {
 
     }
 
-    public String getUserInfo(String email)//회원정보 불러오기
+    public String getUserInfo(String email)// 회원정보 불러오기
     {
-        try
-        {
+        try {
             setDB();
-            String sql="SELECT name,sex,difficulty,purpose FROM user_info\n"
-            +"WHERE email='"+email+"'";
-            result=stmt.executeQuery(sql);
-            if(result.getString("name")==null)
-            {
+            String sql = "SELECT name,sex,difficulty,purpose FROM user_info\n" + "WHERE email='" + email + "'";
+            result = stmt.executeQuery(sql);
+            if (result.getString("name") == null) {
                 commit();
                 return "Invalid Email";
-            }
-            else
-            {
-                String toReturn=result.getString("name")+"/"
-                +result.getString("sex")+"/"
-                +result.getString("difficulty")+"/"
-                +result.getString("purpose");
+            } else {
+                String toReturn = result.getString("name") + "/" + result.getString("sex") + "/"
+                        + result.getString("difficulty") + "/" + result.getString("purpose");
                 commit();
                 return toReturn;
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String modInfo(String email,String name,String pw,String sex,String difficulty,String purpose)//회원정보 수정
+    public String modInfo(String email, String name, String pw, String sex, String difficulty, String purpose)// 회원정보 수정
     {
-        try
-        {
+        try {
             setDB();
-            String sql="UPDATE user_info\n" + "SET name='" + name + "'\n" + "WHERE email='" + email + "'";
+            String sql = "UPDATE user_info\n" + "SET name='" + name + "'\n" + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
             sql = "UPDATE user_info\n" + "SET pw='" + Encrypting.encrypt(pw) + "'\n" + "WHERE email='" + email + "'";
             stmt.executeUpdate(sql);
@@ -277,683 +241,588 @@ public class ConDB {
             stmt.executeUpdate(sql);
             commit();
             return "Clear";
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String getImage(String train,String difficulty)//이미지 링크 가져오기
+    public String getImage(String train, String difficulty)// 이미지 링크 가져오기
     {
-        String image,sql;
+        String image, sql;
         setDB();
-        try
-        {
-            switch(difficulty)
-            {
+        try {
+            switch (difficulty) {
                 case "초급자":
-                sql="SELECT image FROM train_elementary\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((image=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No image";
-                }
-                else
-                {
-                    commit();
-                    return image;
-                }
+                    sql = "SELECT image FROM train_elementary\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((image = result.getString("image")) == null) {
+                        commit();
+                        return "No image";
+                    } else {
+                        commit();
+                        return image;
+                    }
                 case "중급자":
-                sql="SELECT image FROM train_middle\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((image=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No image";
-                }
-                else
-                {
-                    commit();
-                    return image;
-                }
+                    sql = "SELECT image FROM train_middle\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((image = result.getString("image")) == null) {
+                        commit();
+                        return "No image";
+                    } else {
+                        commit();
+                        return image;
+                    }
                 case "상급자":
-                sql="SELECT image FROM train_high\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((image=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No image";
-                }
-                else
-                {
-                    commit();
-                    return image;
-                }
+                    sql = "SELECT image FROM train_high\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((image = result.getString("image")) == null) {
+                        commit();
+                        return "No image";
+                    } else {
+                        commit();
+                        return image;
+                    }
                 default:
-                return "Invalid Difficulty";
+                    return "Invalid Difficulty";
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String getVideo(String train,String difficulty)//비디오 링크 가져오기
+    public String getVideo(String train, String difficulty)// 비디오 링크 가져오기
     {
-        String video,sql;
+        String video, sql;
         setDB();
-        try
-        {
-            switch(difficulty)
-            {
+        try {
+            switch (difficulty) {
                 case "초급자":
-                sql="SELECT video FROM train_elementary\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((video=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No video";
-                }
-                else
-                {
-                    commit();
-                    return video;
-                }
+                    sql = "SELECT video FROM train_elementary\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((video = result.getString("image")) == null) {
+                        commit();
+                        return "No video";
+                    } else {
+                        commit();
+                        return video;
+                    }
                 case "중급자":
-                sql="SELECT video FROM train_middle\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((video=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No video";
-                }
-                else
-                {
-                    commit();
-                    return video;
-                }
+                    sql = "SELECT video FROM train_middle\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((video = result.getString("image")) == null) {
+                        commit();
+                        return "No video";
+                    } else {
+                        commit();
+                        return video;
+                    }
                 case "상급자":
-                sql="SELECT video FROM train_high\n"
-                +"WHERE name='"+train+"'";
-                result=stmt.executeQuery(sql);
-                if((video=result.getString("image"))==null)
-                {
-                    commit();
-                    return "No video";
-                }
-                else
-                {
-                    commit();
-                    return video;
-                }
+                    sql = "SELECT video FROM train_high\n" + "WHERE name='" + train + "'";
+                    result = stmt.executeQuery(sql);
+                    if ((video = result.getString("image")) == null) {
+                        commit();
+                        return "No video";
+                    } else {
+                        commit();
+                        return video;
+                    }
                 default:
-                commit();
-                return "Invalid Difficulty";
+                    commit();
+                    return "Invalid Difficulty";
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String getTrain(String email,String purpose,String difficulty)//오늘의 운동 새로 가져오기(이 메소드를 getTrain_Check의 train 매개변수로 사용할 것)
+    public String getTrain(String email, String purpose, String difficulty)// 오늘의 운동 새로 가져오기(이 메소드를 getTrain_Check의
+                                                                           // train 매개변수로 사용할 것)
     {
-        try
-        {
+        try {
             String sql;
-            ArrayList<String> list=new ArrayList<>();
+            ArrayList<String> list = new ArrayList<>();
             setDB();
-            if(purpose.equals("지구력 강화"))
-            {
-            switch(difficulty)
-            {
-                case "초급자":
-                sql="SELECT name FROM train_elementary\n"
-                +"WHERE purpose='"+purpose+"'";
-                result=stmt.executeQuery(sql);
-            if(result.getString("name")==null)
-            {
-                rollback();
-                return "Invalid Value";
-            }
-            else
-            {
-                String train="";
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
+            if (purpose.equals("지구력 강화")) {
+                switch (difficulty) {
+                    case "초급자":
+                        sql = "SELECT name FROM train_elementary\n" + "WHERE purpose='" + purpose + "'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Value";
+                        } else {
+                            String train = "";
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+
+                            HashSet<Integer> randomNum = new HashSet<>();// 운동 중복 방지
+                            while (randomNum.size() < 4) {
+                                randomNum.add((int) Math.random() * list.size());// 운동을 랜덤으로 중복 안 되게 추출
+                            }
+                            Iterator it = randomNum.iterator();
+                            Stack<String> stack = new Stack<>();
+                            while (it.hasNext()) {
+                                stack.push(list.get((int) it.next()));
+                            }
+
+                            for (int i = 0; i < stack.size(); i++) {
+                                sql = "SELECT name,quantity,unit,sett FROM train_elementary\n" + "WHERE name='"
+                                        + stack.pop() + "'";
+                                stmt.executeQuery(sql);
+                                train = train + result.getString("name") + "/"
+                                        + Integer.toString(result.getInt("quantity")) + "/" + result.getString("unit")
+                                        + "/" + Integer.toString(result.getInt("sett")) + "%";
+                            }
+                            commit();
+                            return train;
+                        }
+
+                    case "중급자":
+                        sql = "SELECT name FROM train_middle\n" + "WHERE purpose='" + purpose + "'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Value";
+                        } else {
+                            String train = "";
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+
+                            HashSet<Integer> randomNum = new HashSet<>();// 운동 중복 방지
+                            while (randomNum.size() < 4) {
+                                randomNum.add((int) Math.random() * list.size());// 운동을 랜덤으로 중복 안 되게 추출
+                            }
+                            Iterator it = randomNum.iterator();
+                            Stack<String> stack = new Stack<>();
+
+                            while (it.hasNext()) {
+                                stack.push(list.get((int) it.next()));
+                            }
+
+                            for (int i = 0; i < stack.size(); i++) {
+                                sql = "SELECT name,quantity,unit,sett FROM train_middle\n" + "WHERE name='"
+                                        + stack.pop() + "'";
+                                stmt.executeQuery(sql);
+                                train = train + result.getString("name") + "/"
+                                        + Integer.toString(result.getInt("quantity")) + "/" + result.getString("unit")
+                                        + "/" + Integer.toString(result.getInt("sett")) + "%";
+                            }
+                            commit();
+                            return train;
+                        }
+                    case "상급자":
+                        sql = "SELECT name FROM train_high\n" + "WHERE purpose='" + purpose + "'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Value";
+                        } else {
+                            String train = "";
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+
+                            HashSet<Integer> randomNum = new HashSet<>();// 운동 중복 방지
+                            while (randomNum.size() < 4) {
+                                randomNum.add((int) Math.random() * list.size());// 운동을 랜덤으로 중복 안 되게 추출
+                            }
+                            Iterator it = randomNum.iterator();
+                            Stack<String> stack = new Stack<>();
+                            while (it.hasNext()) {
+                                stack.push(list.get((int) it.next()));
+                            }
+
+                            for (int i = 0; i < stack.size(); i++) {
+                                sql = "SELECT name,quantity,unit,sett FROM train_high\n" + "WHERE name='" + stack.pop()
+                                        + "'";
+                                stmt.executeQuery(sql);
+                                train = train + result.getString("name") + "/"
+                                        + Integer.toString(result.getInt("quantity")) + "/" + result.getString("unit")
+                                        + "/" + Integer.toString(result.getInt("sett")) + "%";
+                            }
+                            commit();
+                            return train;
+                        }
+                    default:
+                        commit();
+                        return "Invalid Difficulty";
                 }
 
-                HashSet<Integer> randomNum=new HashSet<>();//운동 중복 방지
-                while(randomNum.size()<4)
-                {
-                    randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
-                }
-                Iterator it=randomNum.iterator();
-                Stack<String> stack=new Stack<>();
-                while(it.hasNext())
-                {
-                    stack.push(list.get((int)it.next()));
-                }
-
-                for(int i=0;i<stack.size();i++)
-                {
-                    sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
-                    +"WHERE name='"+stack.pop()+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
-                }
-                commit();
-                return train;
             }
-                
-                case "중급자":
-                sql="SELECT name FROM train_middle\n"
-                +"WHERE purpose='"+purpose+"'";
-                result=stmt.executeQuery(sql);
-            if(result.getString("name")==null)
-            {
-                rollback();
-                return "Invalid Value";
-            }
-            else
-            {
-                String train="";
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
 
-                HashSet<Integer> randomNum=new HashSet<>();//운동 중복 방지
-                while(randomNum.size()<4)
-                {
-                    randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
-                }
-                Iterator it=randomNum.iterator();
-                Stack<String> stack=new Stack<>();
-
-                while(it.hasNext())
-                {
-                    stack.push(list.get((int)it.next()));
-                }
-
-                for(int i=0;i<stack.size();i++)
-                {
-                    sql="SELECT name,quantity,unit,sett FROM train_middle\n"
-                    +"WHERE name='"+stack.pop()+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
-                }
-                commit();
-                return train;
-            }
-                case "상급자":
-                sql="SELECT name FROM train_high\n"
-                +"WHERE purpose='"+purpose+"'";
-                result=stmt.executeQuery(sql);
-            if(result.getString("name")==null)
-            {
-                rollback();
-                return "Invalid Value";
-            }
-            else
-            {
-                String train="";
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-
-                HashSet<Integer> randomNum=new HashSet<>();//운동 중복 방지
-                while(randomNum.size()<4)
-                {
-                    randomNum.add((int)Math.random()*list.size());//운동을 랜덤으로 중복 안 되게 추출
-                }
-                Iterator it=randomNum.iterator();
-                Stack<String> stack=new Stack<>();
-                while(it.hasNext())
-                {
-                    stack.push(list.get((int)it.next()));
-                }
-
-                for(int i=0;i<stack.size();i++)
-                {
-                    sql="SELECT name,quantity,unit,sett FROM train_high\n"
-                    +"WHERE name='"+stack.pop()+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
-                }
-                commit();
-                return train;
-            }
-                default:
-                commit();
-                return "Invalid Difficulty";
-            }
-            
-
-            }
-            
-            else //지구력 강화가 아닐 때
+            else // 지구력 강화가 아닐 때
             {
                 String train;
                 String selected;
-                switch(difficulty)
-                {
+                switch (difficulty) {
                     case "초급자":
-                    train="";
+                        train = "";
 
-                    //상체 옵션
-                    sql="SELECT name FROM train_elementary\n"
-                    +"WHERE purpose='"+purpose+"' AND part='상체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        // 상체 옵션
+                        sql = "SELECT name FROM train_elementary\n" + "WHERE purpose='" + purpose + "' AND part='상체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                     
-                    }
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    //하체 옵션
+                            sql = "SELECT name,quantity,unit,sett FROM train_elementary\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
 
-                    sql="SELECT name FROM train_elementary\n"
-                    +"WHERE purpose='"+purpose+"' AND part='하체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                            list.clear();
 
-                    list.clear();
-                     
-                    }
+                        }
 
-                    //유산소 옵션
+                        // 하체 옵션
 
-                    sql="SELECT name FROM train_elementary\n"
-                    +"WHERE purpose='"+purpose+"' AND part='유산소'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_elementary\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        sql = "SELECT name FROM train_elementary\n" + "WHERE purpose='" + purpose + "' AND part='하체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                    
-                    //리턴
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    commit();
-                    return train;
-                    }
-                    
+                            sql = "SELECT name,quantity,unit,sett FROM train_elementary\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                        }
+
+                        // 유산소 옵션
+
+                        sql = "SELECT name FROM train_elementary\n" + "WHERE purpose='" + purpose + "' AND part='유산소'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
+
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
+
+                            sql = "SELECT name,quantity,unit,sett FROM train_elementary\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                            // 리턴
+
+                            commit();
+                            return train;
+                        }
+
                     case "중급자":
-                    train="";
+                        train = "";
 
-                    //상체 옵션
-                    sql="SELECT name FROM train_middle\n"
-                    +"WHERE purpose='"+purpose+"' AND part='상체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_middle\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        // 상체 옵션
+                        sql = "SELECT name FROM train_middle\n" + "WHERE purpose='" + purpose + "' AND part='상체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                     
-                    }
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    //하체 옵션
+                            sql = "SELECT name,quantity,unit,sett FROM train_middle\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
 
-                    sql="SELECT name FROM train_middle\n"
-                    +"WHERE purpose='"+purpose+"' AND part='하체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_middle\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                            list.clear();
 
-                    list.clear();
-                     
-                    }
+                        }
 
-                    //유산소 옵션
+                        // 하체 옵션
 
-                    sql="SELECT name FROM train_middle\n"
-                    +"WHERE purpose='"+purpose+"' AND part='유산소'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_middle\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        sql = "SELECT name FROM train_middle\n" + "WHERE purpose='" + purpose + "' AND part='하체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                    
-                    //리턴
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    commit();
-                    return train;
-                    }
+                            sql = "SELECT name,quantity,unit,sett FROM train_middle\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                        }
+
+                        // 유산소 옵션
+
+                        sql = "SELECT name FROM train_middle\n" + "WHERE purpose='" + purpose + "' AND part='유산소'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
+
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
+
+                            sql = "SELECT name,quantity,unit,sett FROM train_middle\n" + "WHERE name='" + selected
+                                    + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                            // 리턴
+
+                            commit();
+                            return train;
+                        }
 
                     case "상급자":
-                    train="";
+                        train = "";
 
-                    //상체 옵션
-                    sql="SELECT name FROM train_high\n"
-                    +"WHERE purpose='"+purpose+"' AND part='상체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_high\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        // 상체 옵션
+                        sql = "SELECT name FROM train_high\n" + "WHERE purpose='" + purpose + "' AND part='상체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                     
-                    }
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    //하체 옵션
+                            sql = "SELECT name,quantity,unit,sett FROM train_high\n" + "WHERE name='" + selected + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
 
-                    sql="SELECT name FROM train_high\n"
-                    +"WHERE purpose='"+purpose+"' AND part='하체'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_high\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                            list.clear();
 
-                    list.clear();
-                     
-                    }
+                        }
 
-                    //유산소 옵션
+                        // 하체 옵션
 
-                    sql="SELECT name FROM train_high\n"
-                    +"WHERE purpose='"+purpose+"' AND part='유산소'";
-                    result=stmt.executeQuery(sql);
-                    if(result.getString("name")==null)
-                    {
-                        rollback();
-                        return "Invalid Difficulty";
-                    }
-                    else
-                    {
-                        
-                while(result.next())
-                {
-                    list.add(result.getString("name"));
-                }
-                selected=list.get((int)Math.random()*list.size());
-        
-                sql="SELECT name,quantity,unit,sett FROM train_high\n"
-                    +"WHERE name='"+selected+"'";
-                    stmt.executeQuery(sql);
-                    train=train+result.getString("name")+"/"
-                    +Integer.toString(result.getInt("quantity"))+"/"
-                    +result.getString("unit")+"/"
-                    +Integer.toString(result.getInt("sett"))+"%";
+                        sql = "SELECT name FROM train_high\n" + "WHERE purpose='" + purpose + "' AND part='하체'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
 
-                    list.clear();
-                    
-                    //리턴
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
 
-                    commit();
-                    return train;
-                    }
+                            sql = "SELECT name,quantity,unit,sett FROM train_high\n" + "WHERE name='" + selected + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                        }
+
+                        // 유산소 옵션
+
+                        sql = "SELECT name FROM train_high\n" + "WHERE purpose='" + purpose + "' AND part='유산소'";
+                        result = stmt.executeQuery(sql);
+                        if (result.getString("name") == null) {
+                            rollback();
+                            return "Invalid Difficulty";
+                        } else {
+
+                            while (result.next()) {
+                                list.add(result.getString("name"));
+                            }
+                            selected = list.get((int) Math.random() * list.size());
+
+                            sql = "SELECT name,quantity,unit,sett FROM train_high\n" + "WHERE name='" + selected + "'";
+                            stmt.executeQuery(sql);
+                            train = train + result.getString("name") + "/" + Integer.toString(result.getInt("quantity"))
+                                    + "/" + result.getString("unit") + "/" + Integer.toString(result.getInt("sett"))
+                                    + "%";
+
+                            list.clear();
+
+                            // 리턴
+
+                            commit();
+                            return train;
+                        }
                     default:
-                    rollback();
-                    return "Invalid Difficulty";
+                        rollback();
+                        return "Invalid Difficulty";
 
                 }
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             rollback();
             return "Error";
         }
     }
 
-    public String getTrain_Check(String email,String train)//기존의 운동 로그와 비교해 오늘의 운동을 새로 가져오기
+    public String getTrain_Check(String email, String train)// 기존의 운동 로그와 비교해 오늘의 운동을 새로 가져오기
     {
-        ArrayList<Train> arr_train=new ArrayList<>();
-        ArrayList<String> arr_log=new ArrayList<>();
-        StringTokenizer st_ln=new StringTokenizer(train,"%");
-        ArrayList<String> train_ln=new ArrayList<>();
-        while(st_ln.hasMoreTokens())
-        {
+        ArrayList<Train> arr_train = new ArrayList<>();
+        ArrayList<String> arr_log = new ArrayList<>();
+        StringTokenizer st_ln = new StringTokenizer(train, "%");
+        ArrayList<String> train_ln = new ArrayList<>();
+        while (st_ln.hasMoreTokens()) {
             train_ln.add(st_ln.nextToken());
         }
-        for(int i=0;i<train_ln.size();i++)
-        {
-            StringTokenizer st_att=new StringTokenizer(train_ln.get(i),"/");
-            Train t=new Train();
-            t.name=st_att.nextToken();
-            t.quantity=Integer.parseInt(st_att.nextToken());
-            t.unit=st_att.nextToken();
-            t.sett=Integer.parseInt(st_att.nextToken());
+        for (int i = 0; i < train_ln.size(); i++) {
+            StringTokenizer st_att = new StringTokenizer(train_ln.get(i), "/");
+            Train t = new Train();
+            t.name = st_att.nextToken();
+            t.quantity = Integer.parseInt(st_att.nextToken());
+            t.unit = st_att.nextToken();
+            t.sett = Integer.parseInt(st_att.nextToken());
             arr_train.add(t);
         }
 
         train_ln.clear();
-        String[] recent=getDate();
-        for(int i=0;i<recent.length;i++)
-        {
-            String log=checkLog(email,recent[i]);
-            if(log.equals("N"))
-            {
-                
-            }
-            else if(log.equals("Error"))
-            {
+        String[] recent = getDate();
+        for (int i = 0; i < recent.length; i++) {
+            String log = checkLog(email, recent[i]);
+            if (log.equals("N")) {
+
+            } else if (log.equals("Error")) {
                 return "Error";
-            }
-            else
-            {
+            } else {
                 arr_log.add(log);
             }
         }
-        for(int i=0;i<arr_log.size();i++)
-        {
-            st_ln=new StringTokenizer(arr_log.get(i),"%");
-            while(st_ln.hasMoreTokens())
-            {
+        for (int i = 0; i < arr_log.size(); i++) {
+            st_ln = new StringTokenizer(arr_log.get(i), "%");
+            while (st_ln.hasMoreTokens()) {
                 train_ln.add(st_ln.nextToken());
             }
-            for(int j=0;j<train_ln.size();j++)
-            {
-                StringTokenizer st_att=new StringTokenizer(train_ln.get(j),"/");
-                for(int k=0;k<arr_train.size();k++)
-                {
-                    if(arr_train.get(k).name.equals(st_att.nextToken()))
-                    {
+            for (int j = 0; j < train_ln.size(); j++) {
+                StringTokenizer st_att = new StringTokenizer(train_ln.get(j), "/");
+                for (int k = 0; k < arr_train.size(); k++) {
+                    if (arr_train.get(k).name.equals(st_att.nextToken())) {
                         arr_train.get(k).log_quan.add(Integer.parseInt(st_att.nextToken()));
-                        String unit=st_att.nextToken();
+                        String unit = st_att.nextToken();
                         arr_train.get(k).log_sett.add(Integer.parseInt(st_att.nextToken()));
                     }
                 }
-            }            
+            }
         }
 
-        for(int i=0;i<arr_train.size();i++)
-        {
+        for (int i = 0; i < arr_train.size(); i++) {
             arr_train.get(i).setQuan();
             arr_train.get(i).setSett();
         }
 
-        String toReturn="";
+        String toReturn = "";
 
-        for(int i=0;i<arr_train.size();i++)
-        {
-            toReturn=toReturn+arr_train.get(i).name+"/"
-            +arr_train.get(i).quantity+"/"
-            +arr_train.get(i).unit+"/"
-            +arr_train.get(i).sett+"%";
+        for (int i = 0; i < arr_train.size(); i++) {
+            toReturn = toReturn + arr_train.get(i).name + "/" + arr_train.get(i).quantity + "/" + arr_train.get(i).unit
+                    + "/" + arr_train.get(i).sett + "%";
+
+        }
+        setDB();
+        for (int i = 0; i < arr_train.size(); i++) {
+            String sql = "INSERT INTO " + email + "_today\n" + "VALUES('" + arr_train.get(i).name + "',"
+                    + arr_train.get(i).quantity + ",'" + arr_train.get(i).unit + "'," + arr_train.get(i).sett + ");";
+            try {
+                stmt.executeUpdate(sql);
+                commit();
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                rollback();
+            }
         }
         return toReturn;
     }
 
+    public String today_Train(String email)//오늘 제시된 운동 및 할당량을 가져오는 메소드
+    {
+        setDB();
+        try
+        {
+            String sql="SELECT * FROM "+email+"_today";
+            result=stmt.executeQuery(sql);
+            if(result.getString("name")==null)
+            {
+                return "N";
+            }
+            else
+            {
+                String log="";
+                while(result.next())
+                {
+                    log=log+result.getString("name")+"/"
+                    +Integer.toString(result.getInt("quantity"))+"/"
+                    +result.getString("unit")+"/"
+                    +Integer.toString(result.getInt("sett"))+"%";
+                }
+                return log; 
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            rollback();
+            return "Error";
+        }
+    }
+    
     private String[] getDate()//최근 5일까지의 데이터를 얻기 위함.
     {
         String[] recent=new String[6];
