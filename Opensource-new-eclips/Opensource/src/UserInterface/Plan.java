@@ -42,11 +42,11 @@ import java.awt.Container;
 public class Plan extends Frame implements TextListener{
 
 	private JFrame frame;
-	static TextField insert_wokrout;
+	static TextField insert_workout;
 	static TextField insert_set;
-	static TextField insert_wokrout2;
+	static TextField insert_workout2;
 	static TextField insert_set2;
-	static TextField insert_wokrout3;
+	static TextField insert_workout3;
 	static TextField insert_set3;
 	
 	private String Train_info;
@@ -54,8 +54,7 @@ public class Plan extends Frame implements TextListener{
 	private String Date_Now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")); //현재 시간 확인 
 	private String Today_Log; // today_Train의 리턴값을 받아서 당일 날 재접속인지 아닌지  판별.
 	private String RE;
-	private String update_quantity ;
-	private String update_set ;
+	
 	
 	
 	static String[] Img_Link = new String[3];
@@ -533,10 +532,10 @@ public class Plan extends Frame implements TextListener{
 		lblNewLabel_2.setBounds(123, 277, 57, 15);
 		frame.getContentPane().add(lblNewLabel_2);
 		
-		insert_wokrout = new TextField();
-		insert_wokrout.setBounds(69, 277, 44, 21);
-		frame.getContentPane().add(insert_wokrout);
-		insert_wokrout.setColumns(10);
+		insert_workout = new TextField();
+		insert_workout.setBounds(69, 277, 44, 21);
+		frame.getContentPane().add(insert_workout);
+		insert_workout.setColumns(10);
 		
 		insert_set = new TextField();
 		insert_set.setColumns(10);
@@ -581,10 +580,10 @@ public class Plan extends Frame implements TextListener{
 		label.setBounds(254, 277, 57, 15);
 		frame.getContentPane().add(label);
 		
-		insert_wokrout2 = new TextField();
-		insert_wokrout2.setColumns(10);
-		insert_wokrout2.setBounds(311, 277, 44, 21);
-		frame.getContentPane().add(insert_wokrout2);
+		insert_workout2 = new TextField();
+		insert_workout2.setColumns(10);
+		insert_workout2.setBounds(311, 277, 44, 21);
+		frame.getContentPane().add(insert_workout2);
 		
 		insert_set2 = new TextField();
 		insert_set2.setColumns(10);
@@ -633,10 +632,10 @@ public class Plan extends Frame implements TextListener{
 		label_2.setBounds(497, 277, 57, 15);
 		frame.getContentPane().add(label_2);
 		
-		insert_wokrout3 = new TextField();
-		insert_wokrout3.setColumns(10);
-		insert_wokrout3.setBounds(554, 277, 44, 21);
-		frame.getContentPane().add(insert_wokrout3);
+		insert_workout3 = new TextField();
+		insert_workout3.setColumns(10);
+		insert_workout3.setBounds(554, 277, 44, 21);
+		frame.getContentPane().add(insert_workout3);
 		
 		insert_set3 = new TextField();
 		insert_set3.setColumns(10);
@@ -750,9 +749,9 @@ public class Plan extends Frame implements TextListener{
 		
 		
 		// textField에 TextListener 활성화.
-		insert_wokrout.addTextListener(this);
-		insert_wokrout2.addTextListener(this);
-		insert_wokrout3.addTextListener(this);
+		insert_workout.addTextListener(this);
+		insert_workout2.addTextListener(this);
+		insert_workout3.addTextListener(this);
 		
 		insert_set.addTextListener(this);
 		insert_set2.addTextListener(this);
@@ -768,14 +767,23 @@ public class Plan extends Frame implements TextListener{
 		{	
 			
 			
-			insert_wokrout.setText(Integer.toString(Workout_saved.get(0).quantity));
-			insert_wokrout2.setText(Integer.toString(Workout_saved.get(1).quantity));
-			insert_wokrout3.setText(Integer.toString(Workout_saved.get(2).quantity));
+			insert_workout.setText(Integer.toString(Workout_saved.get(0).quantity));
+			insert_workout2.setText(Integer.toString(Workout_saved.get(1).quantity));
+			insert_workout3.setText(Integer.toString(Workout_saved.get(2).quantity));
 			
 			insert_set.setText(Integer.toString(Workout_saved.get(0).sett));
 			insert_set2.setText(Integer.toString(Workout_saved.get(1).sett));
 			insert_set3.setText(Integer.toString(Workout_saved.get(2).sett));
 			
+			//값을 불러옴과 동시에 임의 수정 하지 못하게 텍스트 필드 잠금.
+			
+			insert_workout.setEditable(false);
+			insert_workout2.setEditable(false);
+			insert_workout3.setEditable(false);
+			
+			insert_set.setEditable(false);
+			insert_set2.setEditable(false);
+			insert_set3.setEditable(false);
 			
 		}
 				
@@ -848,7 +856,7 @@ public class Plan extends Frame implements TextListener{
 		
 		
 		
-		// 첫번째 운동기록 수정 버튼
+		// 첫번째 운동기록 수정 버튼(버튼을 누르면 수정할  수 있게 만듬)
 		
 		
 		
@@ -857,10 +865,10 @@ public class Plan extends Frame implements TextListener{
 			public void actionPerformed(ActionEvent e) {
 				
 				
-				update_quantity = insert_wokrout.getText();
-				update_set = insert_set.getText();
+				insert_workout.setEditable(true);
+				insert_set.setEditable(true);
 				
-				JOptionPane.showMessageDialog(null,"수정 되었습니다.\n 반드시 운동 기록 저장 버튼을 눌러서 적용해주세요!");
+				JOptionPane.showMessageDialog(null,"해당 운동의 입력값을 수정해 주세요!");
 				
 			}
 		});
@@ -871,10 +879,10 @@ public class Plan extends Frame implements TextListener{
 			public void actionPerformed(ActionEvent e) {
 				
 				
-				update_quantity = insert_wokrout2.getText();
-				update_set = insert_set2.getText();
+				insert_workout2.setEditable(true);
+				insert_set2.setEditable(true);
 				
-				JOptionPane.showMessageDialog(null,"수정 되었습니다.\n 반드시 운동 기록 저장 버튼을 눌러서 적용해주세요!");
+				JOptionPane.showMessageDialog(null,"해당 운동의 입력값을 수정해 주세요!");
 				
 				
 				
@@ -887,10 +895,10 @@ public class Plan extends Frame implements TextListener{
 			public void actionPerformed(ActionEvent e) {
 				
 				
-				update_quantity = insert_wokrout3.getText();
-				update_set = insert_set3.getText();
+				insert_workout3.setEditable(true);
+				insert_set3.setEditable(true);
 				
-				JOptionPane.showMessageDialog(null,"수정 되었습니다.\n 반드시 운동 기록 저장 버튼을 눌러서 적용해주세요!");
+				JOptionPane.showMessageDialog(null,"해당 운동의 입력값을 수정해 주세요!");
 				
 				
 				
@@ -912,9 +920,9 @@ public class Plan extends Frame implements TextListener{
 	
 	public String MakeLog()
 	{
-		Inserted_quantity[0] = insert_wokrout.getText();
-		Inserted_quantity[1] = insert_wokrout2.getText();
-		Inserted_quantity[2] = insert_wokrout3.getText();
+		Inserted_quantity[0] = insert_workout.getText();
+		Inserted_quantity[1] = insert_workout2.getText();
+		Inserted_quantity[2] = insert_workout3.getText();
 		
 		
 		Inserted_set[0] = insert_set.getText();
@@ -947,9 +955,9 @@ public class Plan extends Frame implements TextListener{
 	public void textValueChanged(TextEvent e) {
 		// TODO Auto-generated method stub
 		
-		Inserted_quantity[0] = insert_wokrout.getText();
-		Inserted_quantity[1] = insert_wokrout2.getText();
-		Inserted_quantity[2] = insert_wokrout3.getText();
+		Inserted_quantity[0] = insert_workout.getText();
+		Inserted_quantity[1] = insert_workout2.getText();
+		Inserted_quantity[2] = insert_workout3.getText();
 		
 		
 		Inserted_set[0] = insert_set.getText();
