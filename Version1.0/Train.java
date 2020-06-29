@@ -1,3 +1,5 @@
+package pkg;
+
 import java.util.ArrayList;
 
 public class Train 
@@ -11,8 +13,12 @@ public class Train
     ArrayList<Integer> log_sett=new ArrayList<>();
 
     
-    public void setQuan()//ìš´ë™ quantity ê°’ í‰ê·  ë‚´ê¸°
+    public void setQuan()//¿îµ¿ quantity °ª Æò±Õ ³»±â
     {
+    	if(log_quan.size()==0)
+    	{
+    		return;
+    	}
       for(int i=0;i<log_quan.size();i++)
       {
         quantity+=log_quan.get(i);
@@ -21,14 +27,18 @@ public class Train
       quantity=(int)Math.round(result);
     }
 
-    public void setSett()
+    public void setSett()//¿îµ¿ sett °ª Æò±Õ ³»±â
     {
+    	if(log_sett.size()==0)
+    	{
+    		return;
+    	}
       for(int i=0;i<log_sett.size();i++)
       {
         sett+=log_sett.get(i);
       }
       double result=(double)sett/((double)log_sett.size()+(double)1);
-      quantity=(int)Math.round(result);
+      sett=(int)Math.round(result);
     }
     
     

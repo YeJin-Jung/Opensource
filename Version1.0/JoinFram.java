@@ -1,3 +1,4 @@
+package pkg;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -12,42 +13,43 @@ public class JoinFram extends JFrame {
 
 	public JoinFram() 
 	{
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("È¨Æ®·¹ÀÌ´× ÇÃ·¡³Ê");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(5,5));
 		
-		JLabel lb_SignUp = new JLabel("íšŒì›ê°€ì…\n");
+		JLabel lb_SignUp = new JLabel("È¸¿ø°¡ÀÔ\n");
 		lb_SignUp.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
 		lb_SignUp.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lb_SignUp,BorderLayout.NORTH);
 		
 		GridLayout grid=new GridLayout(6,2,5,5);
 		JPanel ct_panel=new JPanel(grid);
-		JLabel lb_name = new JLabel("ì´ë¦„");
+		JLabel lb_name = new JLabel("ÀÌ¸§");
 		JTextField txt_name=new JTextField();
 		
-		JLabel lb_email = new JLabel("ì´ë©”ì¼");
+		JLabel lb_email = new JLabel("ÀÌ¸ŞÀÏ");
 		JTextField txt_email=new JTextField();
 
-		JButton btn_check = new JButton("ì´ë©”ì¼ ì¤‘ë³µí™•ì¸");
+		JButton btn_check = new JButton("ÀÌ¸ŞÀÏ Áßº¹È®ÀÎ");
 		JLabel lb_check=new JLabel();
 		
-		JLabel lb_pw = new JLabel("ë¹„ë°€ë²ˆí˜¸");
+		JLabel lb_pw = new JLabel("ºñ¹Ğ¹øÈ£");
 		JPasswordField txt_pw=new JPasswordField("");
 		
-		JLabel lb_pwc = new JLabel("ë¹„ë°€ë²ˆí˜¸ í™•ì¸");
+		JLabel lb_pwc = new JLabel("ºñ¹Ğ¹øÈ£ È®ÀÎ");
 		JPasswordField txt_pwc=new JPasswordField("");
 		JLabel lb_PWSame=new JLabel("");
 
 		
 
-		JButton btn_enter=new JButton("íšŒì› ê°€ì…");
+		JButton btn_enter=new JButton("È¸¿ø °¡ÀÔ");
 		
 		
 		
-		class Action_ECheck implements ActionListener //ì´ë©”ì¼ ì¤‘ë³µ ê²€ì‚¬ ë²„íŠ¼ ì´ë²¤íŠ¸
+		class Action_ECheck implements ActionListener //ÀÌ¸ŞÀÏ Áßº¹ °Ë»ç ¹öÆ° ÀÌº¥Æ®
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -55,20 +57,20 @@ public class JoinFram extends JFrame {
 				String res=db.emailCheck(txt_email.getText());
 				if(res.equals("E"))
 				{
-					lb_check.setText("ì‚¬ìš© ê°€ëŠ¥");
+					lb_check.setText("»ç¿ë °¡´É");
 				}
 				else if(res.equals("N"))
 				{
-					lb_check.setText("ì‚¬ìš© ë¶ˆê°€");
+					lb_check.setText("»ç¿ë ºÒ°¡");
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null,"ì˜ˆìƒì¹˜ ëª»í•œ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.");
+					JOptionPane.showMessageDialog(null,"¿¹»óÄ¡ ¸øÇÑ ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.");
 				}
 			}
 		}
 
-		class Action_Enter implements ActionListener //íšŒì› ê°€ì… ë²„íŠ¼ ì´ë²¤íŠ¸
+		class Action_Enter implements ActionListener //È¸¿ø °¡ÀÔ ¹öÆ° ÀÌº¥Æ®
 		{
 			private String pwToString(char[] pw)
 			{
@@ -84,7 +86,7 @@ public class JoinFram extends JFrame {
 
 			public void actionPerformed(ActionEvent e)
 			{
-				if(lb_check.getText().equals("ì‚¬ìš© ê°€ëŠ¥")&&lb_PWSame.getText().equals("ë¹„ë°€ë²ˆí˜¸ ì¼ì¹˜"))
+				if(lb_check.getText().equals("»ç¿ë °¡´É")&&lb_PWSame.getText().equals("ºñ¹Ğ¹øÈ£ ÀÏÄ¡"))
 				{
 					if(!txt_name.getText().equals("")&&!txt_email.getText().equals("")
 					&&!pwToString(txt_pw.getPassword()).equals("")
@@ -94,26 +96,26 @@ public class JoinFram extends JFrame {
 					  String res=db.SignUp(txt_email.getText(), txt_name.getText(), pwToString(txt_pw.getPassword()));
 					  if(res.equals("Clear"))
 					  {
-						  JOptionPane.showMessageDialog(null,"íšŒì› ê°€ì…ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤.");
-						  new LoginFram();   //ì‚¬ìš©í•  ë• ì´ê²ƒì„ ì´ìš©í•˜ë„ë¡ í•¨
+						  JOptionPane.showMessageDialog(null,"È¸¿ø °¡ÀÔ¿¡ ¼º°øÇÏ¿´½À´Ï´Ù.");
+						  //new LoginFram();   //»ç¿ëÇÒ ¶© ÀÌ°ÍÀ» ÀÌ¿ëÇÏµµ·Ï ÇÔ
 						  dispose();
 						}
 						else
 						{
-							JOptionPane.showMessageDialog(null,"ì˜ˆìƒì¹˜ ëª»í•œ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.");
+							JOptionPane.showMessageDialog(null,"¿¹»óÄ¡ ¸øÇÑ ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.");
 						}
 
 					}
 					else
 					{
-						JOptionPane.showMessageDialog(null,"ì •ë³´ ì…ë ¥ì„ ë¹ˆì¹¸ ì—†ì´ í•´ì£¼ì„¸ìš”.");
+						JOptionPane.showMessageDialog(null,"Á¤º¸ ÀÔ·ÂÀ» ºóÄ­ ¾øÀÌ ÇØÁÖ¼¼¿ä.");
 					}
 					
 					
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null, "ì•„ì´ë”” ì¤‘ë³µ ì—¬ë¶€,ë¹„ë°€ë²ˆí˜¸ ì¼ì¹˜ ì—¬ë¶€ë¥¼ í™•ì‹¤í•˜ê²Œ í•´ì£¼ì„¸ìš”.");
+					JOptionPane.showMessageDialog(null, "¾ÆÀÌµğ Áßº¹ ¿©ºÎ,ºñ¹Ğ¹øÈ£ ÀÏÄ¡ ¿©ºÎ¸¦ È®½ÇÇÏ°Ô ÇØÁÖ¼¼¿ä.");
 				}
 			}
 		}

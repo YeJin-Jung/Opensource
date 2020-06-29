@@ -1,3 +1,5 @@
+package pkg;
+
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -9,12 +11,12 @@ import java.util.ArrayList;
 
 public class Mail {
 
-  String host="smtp.naver.com";//ë„¤ì´ë²„ ë©”ì¼
+  String host="smtp.naver.com";//³×ÀÌ¹ö ¸ŞÀÏ
 
   private String username;
 	private String password;
 	
-	Mail()//íŒŒì¼ë¡œë¶€í„° ë°œì‹ ìš© ì´ë©”ì¼ ê³„ì • ì •ë³´ ê°€ì ¸ì˜¤ê¸°
+	Mail()//ÆÄÀÏ·ÎºÎÅÍ ¹ß½Å¿ë ÀÌ¸ŞÀÏ °èÁ¤ Á¤º¸ °¡Á®¿À±â
 	{
 		File file=new File("./mail.txt");
 		String readData;
@@ -27,11 +29,13 @@ public class Mail {
 			{
 				arr_acc.add(readData);
 			}
-			username=arr_acc.get(0);
-			password=arr_acc.get(1);
+			AccDecode ad=new AccDecode();
+			username=ad.getPlain(arr_acc.get(0));
+			password=ad.getPlain(arr_acc.get(1));
 			br.close();
 			fr.close();
 			arr_acc.clear();
+			username+="@naver.com";
 		}
 		catch(Exception e)
 		{
@@ -44,10 +48,14 @@ public class Mail {
 
   public void send(String toAddress,String pw)
 	{
-		  //ë©”ì„¸ì§€ ì „ì†¡ ì„¸íŒ…
+	  System.out.println("»ó´ë ¸ŞÀÏ:"+toAddress);
+		  //¸Ş¼¼Áö Àü¼Û ¼¼ÆÃ
 		  Properties pp = new Properties();
 		  pp.put("mail.smtp.host", host);
+		  pp.put("mail.smtp.port", 465);
 		  pp.put("mail.smtp.auth", "true");
+		  pp.put("mail.smtp.ssl.enable","true");
+		  pp.put("mail.smtp.ssl.trust","smtp.naver.com");
 
 		  Session session = Session.getDefaultInstance(pp, new javax.mail.Authenticator() {
 		   protected PasswordAuthentication getPasswordAuthentication() {
@@ -55,15 +63,15 @@ public class Mail {
 		   }
 		  });
 
-		  
+		  //session.setDebug(true);
 		  try {
 		   MimeMessage message = new MimeMessage(session);
 		   message.setFrom(new InternetAddress(username));
 		   message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
       
-       message.setSubject("í™ˆíŠ¸ë ˆì´ë‹ í”Œë˜ë„ˆ ì„ì‹œ ë¹„ë°€ë²ˆí˜¸ì…ë‹ˆë‹¤.");
-		   message.setText("ë‹¹ì‹ ì˜ ë¹„ë°€ë²ˆí˜¸ëŠ” '"+pw+"'ì…ë‹ˆë‹¤.");
-		   Transport.send(message);//ë©”ì¼ ì „ì†¡
+       message.setSubject("È¨Æ®·¹ÀÌ´× ÇÃ·¡³Ê ÀÓ½Ã ºñ¹Ğ¹øÈ£ÀÔ´Ï´Ù.");
+		   message.setText("´ç½ÅÀÇ ºñ¹Ğ¹øÈ£´Â '"+pw+"'ÀÔ´Ï´Ù.");
+		   Transport.send(message);//¸ŞÀÏ Àü¼Û
 
 		  } 
 		  catch (MessagingException e) 

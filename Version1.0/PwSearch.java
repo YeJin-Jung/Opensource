@@ -1,4 +1,4 @@
-package UserInterface;
+package pkg;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -6,27 +6,38 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
 public class PwSearch extends JFrame {
 
-	private JPanel contentPane;
+	static JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
+	ConDB DB = new ConDB();
+	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public void main() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				
 				try {
 					PwSearch frame = new PwSearch();
 					frame.setVisible(true);
+					frame.setResizable(false);
+					frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -38,24 +49,25 @@ public class PwSearch extends JFrame {
 	 * Create the frame.
 	 */
 	public PwSearch() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("»®∆Æ∑π¿Ã¥◊ «√∑°≥ ");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("ÎπÑÎ∞ÄÎ≤àÌò∏ Ï∞æÍ∏∞");
+		JLabel lblNewLabel = new JLabel("∫Òπ–π¯»£ √£±‚");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
 		lblNewLabel.setBounds(152, 25, 117, 25);
 		contentPane.add(lblNewLabel);
 		
-		JLabel lblNewLabel_1 = new JLabel("Ïù¥Î¶Ñ");
+		JLabel lblNewLabel_1 = new JLabel("¿Ã∏ß");
 		lblNewLabel_1.setBounds(50, 82, 61, 16);
 		contentPane.add(lblNewLabel_1);
 		
-		JLabel lblNewLabel_1_1 = new JLabel("Ïù¥Î©îÏùº");
+		JLabel lblNewLabel_1_1 = new JLabel("¿Ã∏ﬁ¿œ");
 		lblNewLabel_1_1.setBounds(50, 124, 61, 16);
 		contentPane.add(lblNewLabel_1_1);
 		
@@ -69,9 +81,52 @@ public class PwSearch extends JFrame {
 		textField_1.setBounds(139, 119, 130, 26);
 		contentPane.add(textField_1);
 		
-		JButton btnNewButton_1 = new JButton("ÌôïÏù∏");
+		JButton btnNewButton_1 = new JButton("»Æ¿Œ");
 		btnNewButton_1.setBounds(263, 167, 88, 25);
 		contentPane.add(btnNewButton_1);
+		
+		//»Æ¿Œ ±‚¥…
+		btnNewButton_1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				String email = textField.getText();
+				String name = textField_1.getText();
+				
+				//∞¯∂ı πﬂª˝Ω√
+				if(email.equals("")  || name.equals(""))
+				{
+					JOptionPane.showMessageDialog(null, "¿Ã∏ﬁ¿œ »§¿∫ ¿Ã∏ß¿ª ¿‘∑¬«ÿ ¡÷ººø‰.");
+					
+				}
+				
+				//µ— ¥Ÿ ¿‘∑¬«ﬂ¿ªΩ√ ∏≈ƒ™ ∞ÀªÁ
+				else {
+					
+					String result = DB.findPW(email, name);
+					
+					//DBø° ∏≈ƒ™µ«¥¬ ¡§∫∏∞° æ¯¿ª Ω√ø°
+					if(result.equals("E")) {
+						
+						JOptionPane.showMessageDialog(null, "«ÿ¥Á ∞Ë¡§¿Ã ¡∏¿Á«œ¡ˆ æ Ω¿¥œ¥Ÿ.\n ¥ŸΩ√ «—π¯ »Æ¿Œ«ÿ ¡÷ººø‰.");
+						
+						
+					}
+					
+					//¿”Ω√ ∫Òπ–π¯»£ πﬂº€
+					else if(result.equals("Clear")) {
+						
+						JOptionPane.showMessageDialog(null, "¿‘∑¬«œΩ≈ ¿Ã∏ﬁ¿œ ¡÷º“∑Œ ¿”Ω√∫Òπ–π¯»£∏¶ ¿¸º€«œø¥Ω¿¥œ¥Ÿ.\n ∏ﬁ¿œ«‘ø°º≠ »Æ¿Œ«ÿ ¡÷ººø‰.");
+						dispose();
+						
+					}
+				}
+
+			}
+		});
 	}
+
+	
 
 }

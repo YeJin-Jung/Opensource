@@ -1,3 +1,5 @@
+package pkg;
+
 import java.security.MessageDigest;
 
 
@@ -6,7 +8,7 @@ public class Encrypting {
 
   private Encrypting()
   {
-    //ìŠ¤íƒœí‹± ë©”ì†Œë“œë§Œ ì´ìš©í•˜ë„ë¡ í•¨
+    //½ºÅÂÆ½ ¸Ş¼Òµå¸¸ ÀÌ¿ëÇÏµµ·Ï ÇÔ
   }
 
   static String encrypt(String pw)
