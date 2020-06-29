@@ -29,20 +29,10 @@ public class PwSearch extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public void main() {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				
-				try {
-					PwSearch frame = new PwSearch();
-					frame.setVisible(true);
-					frame.setResizable(false);
-					frame.setLocationRelativeTo(null);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public void launch() {
+		setVisible(true);
+		setResizable(false);
+		setLocationRelativeTo(null);
 	}
 
 	/**
@@ -59,7 +49,7 @@ public class PwSearch extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("비밀번호 찾기");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
 		lblNewLabel.setBounds(152, 25, 117, 25);
 		contentPane.add(lblNewLabel);
 		
@@ -91,8 +81,8 @@ public class PwSearch extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				String email = textField.getText();
-				String name = textField_1.getText();
+				String name = textField.getText();
+				String email = textField_1.getText();
 				
 				//공란 발생시
 				if(email.equals("")  || name.equals(""))
